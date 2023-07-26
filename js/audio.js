@@ -1,27 +1,13 @@
 function GameBoyAdvanceAudio() {
-  window.AudioContext = window.AudioContext || window.webkitAudioContext;
-  if (window.AudioContext) {
-    var self = this;
-    this.context = new AudioContext();
-    this.bufferSize = 0;
-    this.bufferSize = 4096;
-    this.maxSamples = this.bufferSize << 2;
-    this.buffers = [
-      new Float32Array(this.maxSamples),
-      new Float32Array(this.maxSamples),
-    ];
-    this.sampleMask = this.maxSamples - 1;
-    if (this.context.createScriptProcessor) {
-      this.jsAudio = this.context.createScriptProcessor(this.bufferSize);
-    } else {
-      this.jsAudio = this.context.createJavaScriptNode(this.bufferSize);
-    }
-    this.jsAudio.onaudioprocess = function (e) {
-      self.audioProcess(e);
-    };
-  } else {
-    this.context = null;
-  }
+  this.context = null;
+  this.jsAudio = null;
+  this.bufferSize = 4096;
+  this.maxSamples = this.bufferSize << 2;
+  this.buffers = [
+    new Float32Array(this.maxSamples),
+    new Float32Array(this.maxSamples),
+  ];
+  this.sampleMask = this.maxSamples - 1;
 
   this.masterEnable = true;
   this.masterVolume = 1.0;
@@ -29,7 +15,30 @@ function GameBoyAdvanceAudio() {
   this.SOUND_MAX = 0x400;
   this.FIFO_MAX = 0x200;
   this.PSG_MAX = 0x080;
+
+  try {
+    this.initializeContext();
+  } catch (e) {
+    console.error(
+      "Could not initialize audio context when constructing GameBoyAdvanceAudio",
+      e
+    );
+  }
 }
+
+GameBoyAdvanceAudio.prototype.initializeContext = function () {
+  if (this.context?.state === "running") return;
+
+  if (!this.context) {
+    this.context = new AudioContext();
+    this.jsAudio = this.context.createScriptProcessor(this.bufferSize);
+    this.jsAudio.addEventListener("audioprocess", (e) => {
+      this.audioProcess(e);
+    });
+  } else {
+    this.context.resume().catch(console.error);
+  }
+};
 
 GameBoyAdvanceAudio.prototype.clear = function () {
   this.fifoA = [];

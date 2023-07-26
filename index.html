@@ -28,6 +28,7 @@
 
       try {
         gba = new GameBoyAdvance();
+        gba.keypad.registerHandlers();
         gba.keypad.eatInput = true;
         gba.setLogger(function (level, error) {
           console.log(error);
@@ -51,6 +52,9 @@
 
       window.onload = function () {
         if (gba && FileReader) {
+          var load = document.getElementById("select");
+          load.addEventListener("click", () => gba.audio.initializeContext());
+
           var canvas = document.getElementById("screen");
           gba.setCanvas(canvas);
 

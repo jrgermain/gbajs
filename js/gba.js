@@ -50,7 +50,6 @@ function GameBoyAdvance() {
 
   this.sio.core = this;
 
-  this.keypad.registerHandlers();
   this.doStep = this.waitFrame;
   this.paused = false;
 
@@ -218,9 +217,6 @@ GameBoyAdvance.prototype.runStable = function () {
         }
       } catch (exception) {
         self.ERROR(exception);
-        if (exception.stack) {
-          self.logStackTrace(exception.stack.split("\n"));
-        }
         throw exception;
       }
     };
@@ -235,9 +231,6 @@ GameBoyAdvance.prototype.runStable = function () {
         self.advanceFrame();
       } catch (exception) {
         self.ERROR(exception);
-        if (exception.stack) {
-          self.logStackTrace(exception.stack.split("\n"));
-        }
         throw exception;
       }
     };
@@ -378,17 +371,6 @@ GameBoyAdvance.prototype.log = function (level, message) {};
 
 GameBoyAdvance.prototype.setLogger = function (logger) {
   this.log = logger;
-};
-
-GameBoyAdvance.prototype.logStackTrace = function (stack) {
-  var overflow = stack.length - 32;
-  this.ERROR("Stack trace follows:");
-  if (overflow > 0) {
-    this.log(-1, "> (Too many frames)");
-  }
-  for (var i = Math.max(overflow, 0); i < stack.length; ++i) {
-    this.log(-1, "> " + stack[i]);
-  }
 };
 
 GameBoyAdvance.prototype.ERROR = function (error) {

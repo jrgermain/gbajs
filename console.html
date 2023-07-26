@@ -74,6 +74,7 @@
       }
 
       var core = new GameBoyAdvance();
+      core.keypad.registerHandlers();
       setLogLevel(core.LOG_DEBUG, true);
       var rom = null;
 
