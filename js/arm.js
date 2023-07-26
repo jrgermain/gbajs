@@ -287,7 +287,7 @@ ARMCoreArm = function (cpu) {
         }
         return addr;
       };
-      address.writePC = rn == cpu.PC;
+      address.writesPC = rn == cpu.PC;
       return address;
     },
 
